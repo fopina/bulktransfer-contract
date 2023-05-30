@@ -7,7 +7,9 @@
 
 ## Usage
 
-Check the [examples](examples)
+ABI is available in [Snowtrace](https://snowtrace.io/address/0xee5b5376d71d4af51bdc64ca353f51485fa8d6d5#code).
+
+Check the [examples](examples).
 
 ## Deployments
 
