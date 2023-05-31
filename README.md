@@ -13,6 +13,8 @@ It has 3 functions
 | `bulkTransfer721(address token, Call[] calls)` | Transfer ERC721 `token` to an array of `(target, tokenId)` tuples. | Comparing `testGasBaseline721` with `testGasTransfer721*`, it's already slightly worth for 2 transfers (and it gets better) |
 | `bulkTransfer721Lite(address token, address to, uint256[] tokenIds)` | Transfer an array of `tokenIds` of ERC721 `token` to a single address. | Comparing `testGasBaseline721` with `testGasTransfer721Lite*`, it's already quite worth for 2 transfers (and it gets even better) |
 
+> Do not forget either `approve` (ERC20/721) or `setApprovalForAll` (ERC721) need to be used before any of these.
+
 ## Usage
 
 ABI is available in [Snowtrace](https://snowtrace.io/address/0xee5b5376d71d4af51bdc64ca353f51485fa8d6d5#code).
