@@ -10,6 +10,8 @@ address constant ADDR1 = 0x0000000000000000000000000000000000000001;
 address constant ADDR2 = 0x0000000000000000000000000000000000000002;
 address constant ADDR3 = 0x0000000000000000000000000000000000000003;
 address constant ADDR4 = 0x0000000000000000000000000000000000000004;
+address constant ADDR5 = 0x0000000000000000000000000000000000000005;
+address constant ADDR6 = 0x0000000000000000000000000000000000000006;
 uint256 constant MAX_INT = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
 uint256 constant TEST_AMOUNT = 1000000000000000000;
 
@@ -141,11 +143,21 @@ contract BulkTransferGasTest is Test {
         bulkTransfer.bulkTransfer20(address(callee20), calls);
     }
 
-    function testGasTransfer20Scale() public {
-        BulkTransfer.Call[] memory calls = new BulkTransfer.Call[](3);
+    function testGasTransfer20X2() public {
+        BulkTransfer.Call[] memory calls = new BulkTransfer.Call[](2);
         calls[0] = BulkTransfer.Call(ADDR2, TEST_AMOUNT / 3);
         calls[1] = BulkTransfer.Call(ADDR3, TEST_AMOUNT / 3);
-        calls[2] = BulkTransfer.Call(ADDR4, TEST_AMOUNT / 3);
+        vm.prank(ADDR1);
+        bulkTransfer.bulkTransfer20(address(callee20), calls);
+    }
+
+    function testGasTransfer20X5() public {
+        BulkTransfer.Call[] memory calls = new BulkTransfer.Call[](5);
+        calls[0] = BulkTransfer.Call(ADDR2, TEST_AMOUNT / 5);
+        calls[1] = BulkTransfer.Call(ADDR3, TEST_AMOUNT / 5);
+        calls[2] = BulkTransfer.Call(ADDR4, TEST_AMOUNT / 5);
+        calls[3] = BulkTransfer.Call(ADDR5, TEST_AMOUNT / 5);
+        calls[4] = BulkTransfer.Call(ADDR6, TEST_AMOUNT / 5);
         vm.prank(ADDR1);
         bulkTransfer.bulkTransfer20(address(callee20), calls);
     }
@@ -157,11 +169,21 @@ contract BulkTransferGasTest is Test {
         bulkTransfer.bulkTransfer721(address(callee721), calls);
     }
 
-    function testGasTransfer721Scale() public {
-        BulkTransfer.Call[] memory calls = new BulkTransfer.Call[](3);
+    function testGasTransfer721X2() public {
+        BulkTransfer.Call[] memory calls = new BulkTransfer.Call[](2);
+        calls[0] = BulkTransfer.Call(ADDR2, 1);
+        calls[1] = BulkTransfer.Call(ADDR3, 2);
+        vm.prank(ADDR1);
+        bulkTransfer.bulkTransfer721(address(callee721), calls);
+    }
+
+    function testGasTransfer721X5() public {
+        BulkTransfer.Call[] memory calls = new BulkTransfer.Call[](5);
         calls[0] = BulkTransfer.Call(ADDR2, 1);
         calls[1] = BulkTransfer.Call(ADDR3, 2);
         calls[2] = BulkTransfer.Call(ADDR4, 3);
+        calls[3] = BulkTransfer.Call(ADDR5, 4);
+        calls[4] = BulkTransfer.Call(ADDR6, 5);
         vm.prank(ADDR1);
         bulkTransfer.bulkTransfer721(address(callee721), calls);
     }
@@ -173,11 +195,21 @@ contract BulkTransferGasTest is Test {
         bulkTransfer.bulkTransfer721Lite(address(callee721), ADDR2, calls);
     }
 
-    function testGasTransfer721LiteScale() public {
-        uint256[] memory calls = new uint256[](3);
+    function testGasTransfer721LiteX2() public {
+        uint256[] memory calls = new uint256[](2);
+        calls[0] = 1;
+        calls[1] = 2;
+        vm.prank(ADDR1);
+        bulkTransfer.bulkTransfer721Lite(address(callee721), ADDR2, calls);
+    }
+
+    function testGasTransfer721LiteX5() public {
+        uint256[] memory calls = new uint256[](5);
         calls[0] = 1;
         calls[1] = 2;
         calls[2] = 3;
+        calls[3] = 4;
+        calls[4] = 5;
         vm.prank(ADDR1);
         bulkTransfer.bulkTransfer721Lite(address(callee721), ADDR2, calls);
     }

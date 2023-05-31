@@ -5,6 +5,14 @@
 
 [BulkTransfer](./src/BulkTransfer.sol) main use case is for an EOA to save some gas by batching multiple `transferFrom` calls.
 
+It has 3 functions
+
+| function | description | [gas comments](.gas-snapshot) |
+| -------- | ----------- | ------------ |
+| `bulkTransfer20(address token, Call[] calls)` | Transfers ERC20 `token` to an array of `(target, amount)` tuples. | Comparing `testGasBaseline20` with `testGasTransfer20*`, it's not worth using for less than 4 transfers |
+| `bulkTransfer721(address token, Call[] calls)` | Transfer ERC721 `token` to an array of `(target, tokenId)` tuples. | Comparing `testGasBaseline721` with `testGasTransfer721*`, it's already slightly worth for 2 transfers (and it gets better) |
+| `bulkTransfer721Lite(address token, address to, uint256[] tokenIds)` | Transfer an array of `tokenIds` of ERC721 `token` to a single address. | Comparing `testGasBaseline721` with `testGasTransfer721Lite*`, it's already quite worth for 2 transfers (and it gets even better) |
+
 ## Usage
 
 ABI is available in [Snowtrace](https://snowtrace.io/address/0xee5b5376d71d4af51bdc64ca353f51485fa8d6d5#code).
