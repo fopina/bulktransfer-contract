@@ -65,6 +65,13 @@ PARTIAL_ERC721 = [
         'type': 'function',
     },
     {
+        'inputs': [{'internalType': 'uint256', 'name': 'tokenId', 'type': 'uint256'}],
+        'name': 'ownerOf',
+        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    {
         'inputs': [
             {'internalType': 'address', 'name': 'owner', 'type': 'address'},
             {'internalType': 'address', 'name': 'operator', 'type': 'address'},
