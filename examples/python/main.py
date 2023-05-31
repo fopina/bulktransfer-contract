@@ -17,6 +17,7 @@ BULK_TRANSFER_ADDRESS = '0xf5c47cd4747322bd9065dd07ea6dd499256aa793'
 # test ERC20 and ERC721 contracts
 TEST_TOKEN_ADDRESS = '0x2cDBD48204929c6AD7b77CEd8d3E61364764E1D9'
 TEST_NFT_ADDRESS = '0x6Dd6802E2189a8D94f6cc1A5180f6c893e0bE13b'
+# token IDs to use for NFT bulk transfer - must be 6
 TEST_TOKEN_IDS = [10, 11, 12, 13, 14, 15]
 
 
@@ -34,7 +35,7 @@ def main(argv=None):
     p = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     p.add_argument('wallets', type=Path, help='File containing test wallet private keys: needs 4, 1 per line - and first should have token and NFTs')
     p.add_argument('--reset', action='store_true', help='Undo every default action')
-    args = p.parse_args()
+    args = p.parse_args(argv)
 
     web3 = Web3(Web3.HTTPProvider(PROVIDER_URL))
     web3.middleware_onion.inject(geth_poa_middleware, layer=0)
@@ -60,7 +61,9 @@ def main(argv=None):
     )
 
     if args.reset:
-        return reset(web3, accounts, token_contract, nft_contract)
+        reset(web3, accounts, token_contract)
+        reset_nfts(web3, accounts, nft_contract)
+        return
 
     # ERC20
     balances(accounts, token_contract)
@@ -104,7 +107,26 @@ def main(argv=None):
             accounts[0],
         ),
     )
-    assert len(TEST_TOKEN_IDS) == 6
+    reset_nfts(web3, accounts[:4], nft_contract)
+    report_gas(
+        'bulkTransfer721 6x',
+        _transact(
+            web3,
+            bulk_contract.functions.bulkTransfer721(
+                nft_contract.address,
+                [
+                    (accounts[1].address, TEST_TOKEN_IDS[0]),
+                    (accounts[2].address, TEST_TOKEN_IDS[1]),
+                    (accounts[3].address, TEST_TOKEN_IDS[2]),
+                    (accounts[1].address, TEST_TOKEN_IDS[3]),
+                    (accounts[2].address, TEST_TOKEN_IDS[4]),
+                    (accounts[3].address, TEST_TOKEN_IDS[5]),
+                ]
+            ),
+            accounts[0],
+        ),
+    )
+    reset_nfts(web3, accounts, nft_contract)
     report_gas(
         'bulkTransfer721Lite 3x',
         _transact(
@@ -113,6 +135,19 @@ def main(argv=None):
                 nft_contract.address,
                 accounts[1].address,
                 TEST_TOKEN_IDS[3:]
+            ),
+            accounts[0],
+        ),
+    )
+    reset_nfts(web3, accounts[:4], nft_contract)
+    report_gas(
+        'bulkTransfer721Lite 6x',
+        _transact(
+            web3,
+            bulk_contract.functions.bulkTransfer721Lite(
+                nft_contract.address,
+                accounts[1].address,
+                TEST_TOKEN_IDS
             ),
             accounts[0],
         ),
@@ -135,9 +170,9 @@ def report_gas(desc, tx):
     print(f'{desc} ({fee})')
 
 
-def reset(web3, accounts, token_contract, nft_contract):
-    main, *other = accounts
-    for a in other:
+def reset(web3, accounts, token_contract):
+    main, *others = accounts
+    for a in others:
         _a = a.address
         _b = token_contract.functions.balanceOf(_a).call({"from": _a})
         if _b > 0:
@@ -145,12 +180,15 @@ def reset(web3, accounts, token_contract, nft_contract):
                 f'Restore {_b / DECS} from {_a}',
                 _transact(web3, token_contract.functions.transfer(main.address, _b), a),
             )
-    
+
+
+def reset_nfts(web3, accounts, nft_contract):
+    main = accounts[0]
     a_dict = {
         a.address: a
         for a in accounts
     }
-        
+
     for token_id in TEST_TOKEN_IDS:
         owner = nft_contract.functions.ownerOf(token_id).call()
         if owner != main.address:
